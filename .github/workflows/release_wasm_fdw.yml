@@ -71,6 +71,9 @@ jobs:
           echo "PROJECT=$PROJECT" >> "$GITHUB_OUTPUT"
           echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
           echo "CHECKSUM=$CHECKSUM" >> "$GITHUB_OUTPUT"
+          echo "Project: $PROJECT"
+          echo "Version: $VERSION"
+          echo "Checksum: $CHECKSUM"
 
       - name: Create README.txt
         env:
@@ -117,17 +120,29 @@ jobs:
           For more details, please visit https://fdw.dev.
           EOF
 
-      - name: Rename and prepare release file
+      - name: Prepare release assets
+        id: prepare_assets
         run: |
-          cp ./build/release.wasm ./${PROJECT}.wasm
+          WASM_FILE="${{ steps.extract.outputs.PROJECT }}.wasm"
+          echo "Copying WebAssembly file..."
+          cp ./build/release.wasm "./${WASM_FILE}"
+          ls -la "./${WASM_FILE}"
+          echo "File size: $(stat -c%s ./${WASM_FILE}) bytes"
+          echo "WASM_FILE=${WASM_FILE}" >> "$GITHUB_OUTPUT"
+          
+          # Create a directory for release assets
+          mkdir -p release_assets
+          cp README.txt release_assets/
+          cp checksum.txt release_assets/
+          cp "./${WASM_FILE}" release_assets/
+          
+          echo "Files prepared for release:"
+          ls -la release_assets/
 
       - name: Create release
         id: create_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.2.1
         with:
           generate_release_notes: true
           make_latest: true
-          files: |
-            README.txt
-            checksum.txt
-            ./${PROJECT}.wasm 
+          files: release_assets/* 
