@@ -6,7 +6,7 @@
   "scripts": {
     "asbuild:debug": "asc assembly/index.ts --target debug --config asconfig.json",
     "asbuild:release": "asc assembly/index.ts --target release --config asconfig.json",
-    "asbuild": "asc assembly/minimal-static.ts --target release --config asconfig.json",
+    "asbuild": "asc assembly/minimal.ts --target release --config asconfig.json",
     "asbuild:minimal:debug": "asc assembly/minimal-static.ts --target debug --config asconfig.json",
     "asbuild:minimal:release": "asc assembly/minimal-static.ts --target release --config asconfig.json",
     "asbuild:minimal": "npm run asbuild:minimal:debug && npm run asbuild:minimal:release",
