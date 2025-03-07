@@ -29,13 +29,35 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm list assemblyscript
 
       - name: Create package-lock.json
         run: npm install --package-lock-only
 
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: List files before build
+        run: |
+          echo "Contents of current directory:"
+          ls -la
+          echo "Contents of assembly directory:"
+          ls -la assembly/
+
       - name: Build WebAssembly
-        run: npm run asbuild
+        run: |
+          echo "Running asbuild command..."
+          npm run asbuild
+          echo "Build command completed."
+
+      - name: List files after build
+        run: |
+          echo "Contents of current directory:"
+          ls -la
+          echo "Contents of build directory:"
+          ls -la build/
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3

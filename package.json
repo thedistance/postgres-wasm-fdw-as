@@ -4,8 +4,8 @@
   "description": "Postgres Wasm FDW implemented in AssemblyScript",
   "main": "index.js",
   "scripts": {
-    "asbuild:debug": "asc assembly/minimal.ts --target debug",
-    "asbuild:release": "asc assembly/minimal.ts --target release",
+    "asbuild:debug": "asc assembly/minimal.ts --target debug --config asconfig.json",
+    "asbuild:release": "asc assembly/minimal.ts --target release --config asconfig.json",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",
     "test": "node tests"
   },
