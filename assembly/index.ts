@@ -21,7 +21,7 @@ import { http, time, utils, parseJsonArray } from "./bindings";
 // ExampleFdw class implements the FDW interface
 class ExampleFdw {
   // Static instance
-  private static instance: ExampleFdw | null = null;
+  private static instance: ExampleFdw = new ExampleFdw();
 
   // Instance properties
   private baseUrl: string = "";
@@ -30,9 +30,6 @@ class ExampleFdw {
 
   // Get the singleton instance
   static getInstance(): ExampleFdw {
-    if (ExampleFdw.instance === null) {
-      ExampleFdw.instance = new ExampleFdw();
-    }
     return ExampleFdw.instance;
   }
 
@@ -71,20 +68,28 @@ class ExampleFdw {
     }
 
     this.srcIdx = 0;
-    utils.report_info(`We got response array length: ${this.srcRows.valueOf().length.toString()}`);
+    const rows = this.srcRows;
+    if (rows) {
+      utils.report_info(`We got response array length: ${rows.valueOf().length.toString()}`);
+    }
 
     return null;
   }
 
   // Iterate through the foreign table
-  iter_scan(ctx: Context, row: Row): number | null {
-    if (this.srcRows === null || this.srcIdx >= this.srcRows.valueOf().length) {
-      return null;
+  iter_scan(ctx: Context, row: Row): i32 {
+    const rows = this.srcRows;
+    if (rows === null) {
+      return -1;
+    }
+    
+    if (this.srcIdx >= rows.valueOf().length) {
+      return -1;
     }
 
-    const srcRow = this.srcRows.valueOf()[this.srcIdx];
+    const srcRow = rows.valueOf()[this.srcIdx];
     if (srcRow === null || !srcRow.isObj) {
-      return null;
+      return -1;
     }
 
     const srcObj = <JSON.Obj>srcRow;
@@ -95,8 +100,8 @@ class ExampleFdw {
       
       const src = srcObj.has(tgtColName) ? srcObj.get(tgtColName) : null;
       if (src === null) {
-        // Return null instead of a string to indicate an error
-        return null;
+        // Return error code instead of null
+        return -1;
       }
 
       let cell: Cell | null = null;
@@ -109,7 +114,7 @@ class ExampleFdw {
           break;
         case TypeOid.Int:
           if (src.isInteger) {
-            cell = new IntCell((<JSON.Integer>src).valueOf());
+            cell = new IntCell(<i32>(<JSON.Integer>src).valueOf());
           }
           break;
         case TypeOid.Float:
@@ -134,8 +139,8 @@ class ExampleFdw {
           }
           break;
         default:
-          // Return null instead of a string to indicate an error
-          return null;
+          // Return error code instead of null
+          return -1;
       }
 
       row.push(cell);
@@ -197,7 +202,7 @@ export function begin_scan(ctx: Context): string | null {
   return ExampleFdw.getInstance().begin_scan(ctx);
 }
 
-export function iter_scan(ctx: Context, row: Row): number | null {
+export function iter_scan(ctx: Context, row: Row): i32 {
   return ExampleFdw.getInstance().iter_scan(ctx, row);
 }
 

@@ -20,10 +20,10 @@ export namespace http {
 
 // Time bindings
 export namespace time {
-  export function parse_from_rfc3339(timestamp: string): number {
+  export function parse_from_rfc3339(timestamp: string): i64 {
     // In a real implementation, this would call the host function
     // For now, we'll return a dummy timestamp
-    return Date.now();
+    return i64(Date.now());
   }
 }
 
@@ -38,20 +38,20 @@ export namespace utils {
 
 // JSON parsing helper
 export function parseJson(jsonStr: string): JSON.Obj | null {
-  try {
-    const parsed = <JSON.Obj>JSON.parse(jsonStr);
-    return parsed;
-  } catch (e) {
-    return null;
+  // AssemblyScript doesn't support try/catch, so we'll use a simpler approach
+  const parsed = JSON.parse(jsonStr);
+  if (parsed && parsed.isObj) {
+    return <JSON.Obj>parsed;
   }
+  return null;
 }
 
 // JSON array parsing helper
 export function parseJsonArray(jsonStr: string): JSON.Arr | null {
-  try {
-    const parsed = <JSON.Arr>JSON.parse(jsonStr);
-    return parsed;
-  } catch (e) {
-    return null;
+  // AssemblyScript doesn't support try/catch, so we'll use a simpler approach
+  const parsed = JSON.parse(jsonStr);
+  if (parsed && parsed.isArr) {
+    return <JSON.Arr>parsed;
   }
+  return null;
 } 

@@ -51,7 +51,10 @@ export class Options {
   }
 
   get(key: string): string | null {
-    return this.options.has(key) ? this.options.get(key)! : null;
+    if (this.options.has(key)) {
+      return this.options.get(key);
+    }
+    return null;
   }
 
   require(key: string): string {
@@ -203,7 +206,7 @@ export class Context {
 
   get_options(type: OptionsType): Options {
     if (this.options.has(type)) {
-      return this.options.get(type)!;
+      return this.options.get(type);
     }
     return new Options();
   }
