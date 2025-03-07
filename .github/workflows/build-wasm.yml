@@ -46,10 +46,10 @@ jobs:
           echo "Contents of assembly directory:"
           ls -la assembly/
 
-      - name: Build WebAssembly
+      - name: Build WebAssembly and Export Static Data
         run: |
-          echo "Running asbuild command..."
-          npm run asbuild
+          echo "Running build command..."
+          npm run build
           echo "Build command completed."
 
       - name: List files after build
@@ -60,6 +60,8 @@ jobs:
           ls -la build/
           echo "File sizes:"
           ls -la build/*.wasm | awk '{print $5, $9}'
+          echo "Static data output:"
+          cat static-data-output.csv
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
@@ -70,4 +72,5 @@ jobs:
             build/release.wasm
             build/debug.wat
             build/release.wat
+            static-data-output.csv
           retention-days: 7 

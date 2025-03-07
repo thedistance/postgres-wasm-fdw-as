@@ -39,10 +39,10 @@ jobs:
           echo "Contents of assembly directory:"
           ls -la assembly/
 
-      - name: Build WebAssembly
+      - name: Build WebAssembly and Export Static Data
         run: |
-          echo "Running asbuild:release command..."
-          npm run asbuild:release
+          echo "Running build command..."
+          npm run build
           echo "Build command completed."
 
       - name: List files after build
@@ -51,6 +51,8 @@ jobs:
           ls -la
           echo "Contents of build directory:"
           ls -la build/
+          echo "Static data output:"
+          cat static-data-output.csv
 
       - name: Calculate Wasm file checksum
         uses: jmgilman/actions-generate-checksum@v1
@@ -118,6 +120,8 @@ jobs:
             );
 
           For more details, please visit https://fdw.dev.
+
+          This package includes static test data in CSV format for testing purposes.
           EOF
 
       - name: Prepare release assets
@@ -135,6 +139,7 @@ jobs:
           cp README.txt release_assets/
           cp checksum.txt release_assets/
           cp "./${WASM_FILE}" release_assets/
+          cp static-data-output.csv release_assets/
           
           echo "Files prepared for release:"
           ls -la release_assets/

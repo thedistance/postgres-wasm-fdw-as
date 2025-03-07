@@ -1,0 +1,12 @@
+Postgres Wasm FDW - Static Data Export
+Version: 0.1.0
+Data contains 5 records
+
+Data in CSV format:
+id,type,actor,repo,payload,public,created_at
+12345,PushEvent,"{""login"":""user1"",""id"":1001}","{""name"":""repo1"",""id"":2001}","{""size"":1,""commits"":[]}",true,2023-01-01T00:00:00Z
+12346,PullRequestEvent,"{""login"":""user2"",""id"":1002}","{""name"":""repo2"",""id"":2002}","{""action"":""opened""}",true,2023-01-02T00:00:00Z
+12347,IssueCommentEvent,"{""login"":""user3"",""id"":1003}","{""name"":""repo3"",""id"":2003}","{""action"":""created"",""issue"":{""number"":42}}",true,2023-01-03T00:00:00Z
+12348,WatchEvent,"{""login"":""user4"",""id"":1004}","{""name"":""repo4"",""id"":2004}","{""action"":""started""}",true,2023-01-04T00:00:00Z
+12349,ForkEvent,"{""login"":""user5"",""id"":1005}","{""name"":""repo5"",""id"":2005}","{""forkee"":{""id"":3001}}",true,2023-01-05T00:00:00Z
+

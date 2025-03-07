@@ -2,12 +2,30 @@
   "name": "postgres-wasm-fdw-as",
   "version": "0.1.0",
   "description": "Postgres Wasm FDW implemented in AssemblyScript",
-  "main": "index.js",
+  "main": "index.cjs",
   "scripts": {
     "asbuild:debug": "asc assembly/index.ts --target debug --config asconfig.json",
     "asbuild:release": "asc assembly/index.ts --target release --config asconfig.json",
-    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
-    "test": "node tests"
+    "asbuild": "asc assembly/minimal-static.ts --target release --config asconfig.json",
+    "asbuild:minimal:debug": "asc assembly/minimal-static.ts --target debug --config asconfig.json",
+    "asbuild:minimal:release": "asc assembly/minimal-static.ts --target release --config asconfig.json",
+    "asbuild:minimal": "npm run asbuild:minimal:debug && npm run asbuild:minimal:release",
+    "build": "npm run asbuild:minimal && node index.cjs > static-data-output.csv",
+    "prebuild": "npm install",
+    "postbuild": "echo 'Static data exported to static-data-output.csv'",
+    "test": "node tests",
+    "test:supabase": "node tests/supabase-simulator.js",
+    "test:csv": "node tests/basic-csv-test.js",
+    "test:http": "node tests/http-test.js",
+    "test:exports": "node tests/export-functions.js",
+    "test:mock": "node tests/mock-response-test.js",
+    "test:minimal": "npm run asbuild:minimal && node tests/minimal-static-test.js",
+    "test:simple": "npm run asbuild:minimal && node tests/simple-minimal-test.js",
+    "test:hardcoded": "node tests/hardcoded-data-test.js",
+    "test:rows": "npm run asbuild:minimal && node tests/wasm-rows-test.js",
+    "test:static": "node tests/static-data-test.js",
+    "start": "node index.cjs",
+    "compare": "node tests/compare-implementations.js"
   },
   "author": "",
   "license": "Apache-2.0",
@@ -19,10 +37,14 @@
   "exports": {
     ".": {
       "import": "./build/release.js",
-      "types": "./build/release.d.ts"
+      "types": "./build/release.d.ts",
+      "require": "./index.cjs"
     }
   },
   "dependencies": {
-    "as-wasi": "^0.6.0"
+    "@assemblyscript/loader": "^0.27.34",
+    "as-wasi": "^0.6.0",
+    "csv-parse": "^5.6.0",
+    "node-fetch": "^3.3.2"
   }
 }
