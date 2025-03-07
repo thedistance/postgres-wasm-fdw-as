@@ -1,0 +1,28 @@
+{
+  "name": "postgres-wasm-fdw-as",
+  "version": "0.1.0",
+  "description": "Postgres Wasm FDW implemented in AssemblyScript",
+  "main": "index.js",
+  "scripts": {
+    "asbuild:debug": "asc assembly/index.ts --target debug",
+    "asbuild:release": "asc assembly/index.ts --target release",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "test": "node tests"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "assemblyscript": "^0.27.22",
+    "assemblyscript-json": "^1.1.0"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  },
+  "dependencies": {
+    "as-wasi": "^0.6.0"
+  }
+}
