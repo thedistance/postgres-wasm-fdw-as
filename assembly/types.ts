@@ -79,14 +79,73 @@ export enum TypeOid {
 }
 
 // Cell represents a value in a row
-export type Cell = 
-  | { kind: "Bool", value: boolean }
-  | { kind: "Int", value: number }
-  | { kind: "Float", value: number }
-  | { kind: "String", value: string }
-  | { kind: "Timestamp", value: number }
-  | { kind: "Json", value: string }
-  | { kind: "Null" };
+export class Cell {
+  kind: string;
+  
+  constructor(kind: string) {
+    this.kind = kind;
+  }
+}
+
+export class BoolCell extends Cell {
+  value: boolean;
+  
+  constructor(value: boolean) {
+    super("Bool");
+    this.value = value;
+  }
+}
+
+export class IntCell extends Cell {
+  value: i32;
+  
+  constructor(value: i32) {
+    super("Int");
+    this.value = value;
+  }
+}
+
+export class FloatCell extends Cell {
+  value: f64;
+  
+  constructor(value: f64) {
+    super("Float");
+    this.value = value;
+  }
+}
+
+export class StringCell extends Cell {
+  value: string;
+  
+  constructor(value: string) {
+    super("String");
+    this.value = value;
+  }
+}
+
+export class TimestampCell extends Cell {
+  value: i64;
+  
+  constructor(value: i64) {
+    super("Timestamp");
+    this.value = value;
+  }
+}
+
+export class JsonCell extends Cell {
+  value: string;
+  
+  constructor(value: string) {
+    super("Json");
+    this.value = value;
+  }
+}
+
+export class NullCell extends Cell {
+  constructor() {
+    super("Null");
+  }
+}
 
 // Column definition
 export class Column {
@@ -117,7 +176,7 @@ export class Row {
 
   push(cell: Cell | null): void {
     if (cell === null) {
-      this.cells.push({ kind: "Null" });
+      this.cells.push(new NullCell());
     } else {
       this.cells.push(cell);
     }

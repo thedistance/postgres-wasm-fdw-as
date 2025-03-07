@@ -31,6 +31,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Create package-lock.json
+        run: npm install --package-lock-only
+
       - name: Build WebAssembly
         run: npm run asbuild
 
@@ -41,4 +44,6 @@ jobs:
           path: |
             build/debug.wasm
             build/release.wasm
+            build/debug.wat
+            build/release.wat
           retention-days: 7 

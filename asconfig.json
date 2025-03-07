@@ -4,7 +4,8 @@
       "outFile": "build/debug.wasm",
       "textFile": "build/debug.wat",
       "sourceMap": true,
-      "debug": true
+      "debug": true,
+      "importMemory": true
     },
     "release": {
       "outFile": "build/release.wasm",
@@ -13,10 +14,13 @@
       "optimizeLevel": 3,
       "shrinkLevel": 0,
       "converge": false,
-      "noAssert": false
+      "noAssert": false,
+      "importMemory": true
     }
   },
   "options": {
-    "bindings": "esm"
-  }
+    "bindings": "esm",
+    "importMemory": true
+  },
+  "extends": "./node_modules/assemblyscript/std/assembly.json"
 }

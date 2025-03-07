@@ -1,5 +1,5 @@
 // Bindings for the Wasm Interface Types
-import { JSON } from "assemblyscript-json";
+import { JSON } from "../node_modules/assemblyscript-json/assembly/index";
 import {
   HttpMethod,
   HttpRequest,

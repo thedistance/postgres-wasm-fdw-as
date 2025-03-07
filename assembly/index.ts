@@ -1,5 +1,5 @@
 // Main entry point for the AssemblyScript implementation of the Postgres Wasm FDW
-import { JSON } from "assemblyscript-json";
+import { JSON } from "../node_modules/assemblyscript-json/assembly/index";
 import {
   HttpMethod,
   HttpRequest,
@@ -7,7 +7,14 @@ import {
   Context,
   Row,
   OptionsType,
-  TypeOid
+  TypeOid,
+  BoolCell,
+  IntCell,
+  FloatCell,
+  StringCell,
+  TimestampCell,
+  JsonCell,
+  NullCell
 } from "./types";
 import { http, time, utils, parseJsonArray } from "./bindings";
 
@@ -19,7 +26,7 @@ class ExampleFdw {
   // Instance properties
   private baseUrl: string = "";
   private srcRows: JSON.Arr | null = null;
-  private srcIdx: number = 0;
+  private srcIdx: i32 = 0;
 
   // Get the singleton instance
   static getInstance(): ExampleFdw {
@@ -64,18 +71,18 @@ class ExampleFdw {
     }
 
     this.srcIdx = 0;
-    utils.report_info(`We got response array length: ${this.srcRows.length.toString()}`);
+    utils.report_info(`We got response array length: ${this.srcRows.valueOf().length.toString()}`);
 
     return null;
   }
 
   // Iterate through the foreign table
   iter_scan(ctx: Context, row: Row): number | null {
-    if (this.srcRows === null || this.srcIdx >= this.srcRows.length) {
+    if (this.srcRows === null || this.srcIdx >= this.srcRows.valueOf().length) {
       return null;
     }
 
-    const srcRow = this.srcRows.at(this.srcIdx);
+    const srcRow = this.srcRows.valueOf()[this.srcIdx];
     if (srcRow === null || !srcRow.isObj) {
       return null;
     }
@@ -97,23 +104,33 @@ class ExampleFdw {
       switch (tgtCol.type_oid()) {
         case TypeOid.Bool:
           if (src.isBool) {
-            cell = { kind: "Bool", value: (<JSON.Bool>src).valueOf() };
+            cell = new BoolCell((<JSON.Bool>src).valueOf() ? true : false);
+          }
+          break;
+        case TypeOid.Int:
+          if (src.isInteger) {
+            cell = new IntCell((<JSON.Integer>src).valueOf());
+          }
+          break;
+        case TypeOid.Float:
+          if (src.isFloat) {
+            cell = new FloatCell((<JSON.Float>src).valueOf());
           }
           break;
         case TypeOid.String:
           if (src.isString) {
-            cell = { kind: "String", value: (<JSON.Str>src).valueOf() };
+            cell = new StringCell((<JSON.Str>src).valueOf());
           }
           break;
         case TypeOid.Timestamp:
           if (src.isString) {
             const ts = time.parse_from_rfc3339((<JSON.Str>src).valueOf());
-            cell = { kind: "Timestamp", value: ts };
+            cell = new TimestampCell(ts);
           }
           break;
         case TypeOid.Json:
           if (src.isObj) {
-            cell = { kind: "Json", value: src.toString() };
+            cell = new JsonCell(src.toString());
           }
           break;
         default:
