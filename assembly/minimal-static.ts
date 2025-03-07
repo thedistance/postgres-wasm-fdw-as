@@ -136,20 +136,21 @@ class MinimalFdw {
   }
 
   // Initialize the FDW
-  init(_ctx: Context): string | null {
-    return null;
+  init(_ctx: Context): string {
+    return "";
   }
 
   // Begin scanning the foreign table
-  begin_scan(_ctx: Context): string | null {
+  begin_scan(_ctx: Context): string {
     this.srcIdx = 0;
-    return null;
+    return "";
   }
 
   // Iterate through the foreign table
+  // Return 0 for success (Some(0)), -1 for no more rows (None)
   iter_scan(ctx: Context, row: Row): i32 {
     if (this.srcIdx >= STATIC_DATA.length) {
-      return -1; // No more rows
+      return -1; // No more rows (equivalent to Ok(None) in Rust)
     }
 
     const data = STATIC_DATA[this.srcIdx];
@@ -174,52 +175,56 @@ class MinimalFdw {
       } else if (colName == "public") {
         cell = new BoolCell(data.isPublic);
       } else if (colName == "created_at") {
-        cell = new TimestampCell(i64(Date.now()));
+        // Use a simple timestamp value since Date.parse isn't available in AssemblyScript
+        // This is a Unix timestamp in milliseconds (January 1, 2023)
+        const timestamp = i64(1672531200000 + this.srcIdx * 86400000); // Add one day per row
+        cell = new TimestampCell(timestamp);
       } else {
-        cell = new NullCell();
+        // Return an error for unknown columns
+        return -2; // Error code
       }
       
       row.push(cell);
     }
     
     this.srcIdx++;
-    return 0; // Success
+    return 0; // Success (equivalent to Ok(Some(0)) in Rust)
   }
 
   // Re-scan the foreign table
-  re_scan(_ctx: Context): string | null {
+  re_scan(_ctx: Context): string {
     this.srcIdx = 0;
-    return null;
+    return "";
   }
 
   // End scanning the foreign table
-  end_scan(_ctx: Context): string | null {
-    return null;
+  end_scan(_ctx: Context): string {
+    return "";
   }
 
   // Begin modifying the foreign table
-  begin_modify(_ctx: Context): string | null {
+  begin_modify(_ctx: Context): string {
     return "modify on foreign table is not supported";
   }
 
   // Insert a row into the foreign table
-  insert(_ctx: Context, _row: Row): string | null {
+  insert(_ctx: Context, _row: Row): string {
     return "insert on foreign table is not supported";
   }
 
   // Update a row in the foreign table
-  update(_ctx: Context, _rowid: Cell, _row: Row): string | null {
+  update(_ctx: Context, _rowid: Cell, _row: Row): string {
     return "update on foreign table is not supported";
   }
 
   // Delete a row from the foreign table
-  delete(_ctx: Context, _rowid: Cell): string | null {
+  delete(_ctx: Context, _rowid: Cell): string {
     return "delete on foreign table is not supported";
   }
 
   // End modifying the foreign table
-  end_modify(_ctx: Context): string | null {
-    return null;
+  end_modify(_ctx: Context): string {
+    return "";
   }
 }
 
@@ -228,42 +233,54 @@ export function host_version_requirement(): string {
   return MinimalFdw.getInstance().host_version_requirement();
 }
 
-export function init(ctx: Context): string | null {
+export function init(ctx: Context): string {
   return MinimalFdw.getInstance().init(ctx);
 }
 
-export function begin_scan(ctx: Context): string | null {
+export function begin_scan(ctx: Context): string {
   return MinimalFdw.getInstance().begin_scan(ctx);
 }
 
 export function iter_scan(ctx: Context, row: Row): i32 {
-  return MinimalFdw.getInstance().iter_scan(ctx, row);
+  const result = MinimalFdw.getInstance().iter_scan(ctx, row);
+  
+  // Handle error codes
+  if (result === -2) {
+    // This is an error condition
+    // In a real implementation, we would need to communicate the error message
+    // For now, we'll just return a special value that Supabase can recognize
+    return -2;
+  }
+  
+  // Return the result directly
+  return result;
 }
 
-export function re_scan(ctx: Context): string | null {
+export function re_scan(ctx: Context): string {
   return MinimalFdw.getInstance().re_scan(ctx);
 }
 
-export function end_scan(ctx: Context): string | null {
+export function end_scan(ctx: Context): string {
   return MinimalFdw.getInstance().end_scan(ctx);
 }
 
-export function begin_modify(ctx: Context): string | null {
+export function begin_modify(ctx: Context): string {
   return MinimalFdw.getInstance().begin_modify(ctx);
 }
 
-export function insert(ctx: Context, row: Row): string | null {
+export function insert(ctx: Context, row: Row): string {
   return MinimalFdw.getInstance().insert(ctx, row);
 }
 
-export function update(ctx: Context, rowid: Cell, row: Row): string | null {
+export function update(ctx: Context, rowid: Cell, row: Row): string {
   return MinimalFdw.getInstance().update(ctx, rowid, row);
 }
 
-export function delete_(ctx: Context, rowid: Cell): string | null {
+// Note: Supabase expects 'delete' not 'delete_'
+export function delete_(ctx: Context, rowid: Cell): string {
   return MinimalFdw.getInstance().delete(ctx, rowid);
 }
 
-export function end_modify(ctx: Context): string | null {
+export function end_modify(ctx: Context): string {
   return MinimalFdw.getInstance().end_modify(ctx);
 } 

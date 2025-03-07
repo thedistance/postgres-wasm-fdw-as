@@ -3,14 +3,18 @@ import { readFileSync } from 'fs';
 import { instantiate } from '@assemblyscript/loader';
 import fetch from 'node-fetch';
 
+// Path to the WebAssembly module
+const WASM_PATH = './build/component-model.wasm';
+
 class SupabaseSimulator {
-  constructor(wasmPath) {
+  constructor(wasmPath = WASM_PATH) {
     this.wasmPath = wasmPath;
     this.exports = null;
     this.memory = null;
     this.textDecoder = new TextDecoder();
     this.textEncoder = new TextEncoder();
     this.collectedRows = [];
+    this.githubData = null;
   }
 
   async initialize() {
@@ -306,7 +310,7 @@ class SupabaseSimulator {
 
 // Run the tests
 async function main() {
-  const simulator = new SupabaseSimulator('./build/release.wasm');
+  const simulator = new SupabaseSimulator('./build/component-model.wasm');
 
   if (await simulator.initialize()) {
     await simulator.runTest();

@@ -10,6 +10,7 @@ This example reads the [realtime GitHub events](https://api.github.com/events) i
 ├── assembly
 │   ├── index.ts            # Main entry point for the AssemblyScript code
 │   ├── minimal-static.ts   # Simplified implementation with static data
+│   ├── component-model.ts  # Implementation using the WebAssembly Component Model format
 │   ├── types.ts            # Type definitions
 │   └── bindings.ts         # Bindings for the Wasm Interface Types
 ├── wit                     # The WIT interface this project will use to build the Wasm package
@@ -98,6 +99,67 @@ This will:
 2. Generate a CSV file with the static test data (static-data-output.csv)
 
 The generated CSV file is included in the release artifacts and can be used for testing in deployment environments.
+
+## WebAssembly Component Model
+
+This project also includes an implementation that aligns with the WebAssembly Component Model format, which is compatible with the Rust implementation and Supabase requirements.
+
+### Building the Component Model Version
+
+To build the component model version of the WebAssembly module:
+
+```
+npm run build:component
+```
+
+This will:
+1. Build the component model WebAssembly module
+2. Run tests to verify the component model functionality
+3. Copy the WebAssembly module to the build-component directory with the correct naming convention
+
+### Testing the Component Model
+
+To test only the component model implementation:
+
+```
+npm run test:component
+```
+
+This will build the component model WebAssembly module and run a test script that verifies the exported functions are working correctly.
+
+### Component Model Structure
+
+The component model implementation (`assembly/component-model.ts`) follows the same interface as the Rust implementation, with the following key functions:
+
+- `host_version_requirement()`: Returns the required host version
+- `init(ctx)`: Initializes the FDW
+- `begin_scan(ctx)`: Begins scanning the foreign table
+- `iter_scan(ctx, row)`: Iterates through the foreign table
+- `end_scan(ctx)`: Ends scanning the foreign table
+- `begin_modify(ctx)`: Begins modifying the foreign table
+- `insert(ctx, row)`: Inserts a row into the foreign table
+- `update(ctx, rowid, row)`: Updates a row in the foreign table
+- `delete_(ctx, rowid)`: Deletes a row from the foreign table
+- `end_modify(ctx)`: Ends modifying the foreign table
+
+The component model implementation uses static mock data for demonstration purposes.
+
+### Verifying Component Model Compatibility
+
+To verify that the component model WebAssembly module is compatible with the Supabase Wrappers framework:
+
+```
+npm run verify:component
+```
+
+This will:
+1. Build the component model WebAssembly module
+2. Run tests to verify the component model functionality
+3. Copy the WebAssembly module to the build-component directory
+4. Verify that all required functions are present in the WebAssembly module
+5. Check that the host version requirement is set correctly
+
+The verification script will output a summary of the compatibility check, indicating whether the WebAssembly module is compatible with the Supabase Wrappers framework.
 
 ## License
 

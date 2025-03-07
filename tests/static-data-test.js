@@ -1,5 +1,9 @@
-// Test using static data directly
+// Test for static data in WebAssembly FDW
 import { readFileSync } from 'fs';
+import { instantiate } from '@assemblyscript/loader';
+
+// Path to the WebAssembly module
+const WASM_PATH = './build/component-model.wasm';
 
 // Static data matching what's in minimal-static.ts
 const STATIC_DATA = [
@@ -77,8 +81,11 @@ function rowsToCSV(rows) {
   return csv;
 }
 
-function test() {
+async function testStaticData() {
   try {
+    console.log(`Loading WebAssembly module from ${WASM_PATH}...`);
+    const wasmModule = readFileSync(WASM_PATH);
+
     console.log('Using static data directly...');
     console.log(`Data contains ${STATIC_DATA.length} records`);
 
@@ -99,4 +106,4 @@ function test() {
   }
 }
 
-test(); 
+testStaticData(); 

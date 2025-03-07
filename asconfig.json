@@ -5,7 +5,14 @@
       "textFile": "build/debug.wat",
       "sourceMap": true,
       "debug": true,
-      "importMemory": true
+      "exportMemory": true,
+      "importMemory": false,
+      "initialMemory": 16,
+      "maximumMemory": 64,
+      "noExportMemory": false,
+      "exportTable": true,
+      "exportStart": true,
+      "runtime": "stub"
     },
     "release": {
       "outFile": "build/release.wasm",
@@ -15,12 +22,26 @@
       "shrinkLevel": 0,
       "converge": false,
       "noAssert": false,
-      "importMemory": true
+      "exportMemory": true,
+      "importMemory": false,
+      "initialMemory": 16,
+      "maximumMemory": 64,
+      "noExportMemory": false,
+      "exportTable": true,
+      "exportStart": true,
+      "runtime": "stub"
     }
   },
   "options": {
     "bindings": "esm",
-    "importMemory": true
+    "exportMemory": true,
+    "importMemory": false,
+    "initialMemory": 16,
+    "maximumMemory": 64,
+    "noExportMemory": false,
+    "exportTable": true,
+    "exportStart": true,
+    "runtime": "stub"
   },
   "extends": "./node_modules/assemblyscript/std/assembly.json"
 }
