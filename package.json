@@ -1,0 +1,40 @@
+{
+  "name": "as-wasm-fdw",
+  "version": "1.0.0",
+  "description": "AssemblyScript implementation of a WebAssembly Foreign Data Wrapper for Postgres",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "npm run asbuild:release && node tests/index.js",
+    "test:mock-data": "npm run asbuild:release && node tests/mock-data-test.js",
+    "display:mock-data": "node tests/mock-data-display.js",
+    "asbuild:debug": "asc assembly/index.ts --target debug --exportRuntime",
+    "asbuild:release": "asc assembly/index.ts --target release --exportRuntime --outFile build/release.wasm",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "build": "npm run asbuild:release",
+    "build:component": "npm run asbuild:release && node scripts/convert-to-component.js",
+    "verify": "npm run build:component && node tests/verify-component.js",
+    "start": "npm run asbuild:release && node tests/index.js"
+  },
+  "keywords": [
+    "webassembly",
+    "assemblyscript",
+    "postgres",
+    "fdw"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "assemblyscript": "^0.27.34"
+  },
+  "dependencies": {
+    "@assemblyscript/loader": "^0.27.34",
+    "as-wasi": "^0.6.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  }
+}

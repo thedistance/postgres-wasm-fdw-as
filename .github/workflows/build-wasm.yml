@@ -1,0 +1,76 @@
+name: Build WebAssembly
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'assembly/**'
+      - 'package.json'
+      - 'asconfig.json'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'assembly/**'
+      - 'package.json'
+      - 'asconfig.json'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm list assemblyscript
+
+      - name: Create package-lock.json
+        run: npm install --package-lock-only
+
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: List files before build
+        run: |
+          echo "Contents of current directory:"
+          ls -la
+          echo "Contents of assembly directory:"
+          ls -la assembly/
+
+      - name: Build WebAssembly and Export Static Data
+        run: |
+          echo "Running build command..."
+          npm run build
+          echo "Build command completed."
+
+      - name: List files after build
+        run: |
+          echo "Contents of current directory:"
+          ls -la
+          echo "Contents of build directory:"
+          ls -la build/
+          echo "File sizes:"
+          ls -la build/*.wasm | awk '{print $5, $9}'
+          echo "Static data output:"
+          cat static-data-output.csv
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wasm-build
+          path: |
+            build/debug.wasm
+            build/release.wasm
+            build/debug.wat
+            build/release.wat
+            static-data-output.csv
+          retention-days: 7 
